@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados do Pipefy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            margin: 0;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+        }
+        .container {
+            width: 120%;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            flex-grow: 1;
+            overflow-x: auto; /* Adicionado para permitir rolagem horizontal */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            width: 98%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .info-icon {
+            display: inline-block;
+            margin-left: 5px;
+            width: 16px;
+            height: 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        .info-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #7c7c7c;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            white-space: pre-wrap; /* Permite quebra de linha */
+            max-width: 600px; /* Aumente este valor para ajustar a largura */
+            z-index: 1;
+            opacity: 1;
+            transition: opacity 0.3s;
+            text-align: left; /* Alinha o texto à esquerda */
+        }
+        .info-icon:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #7c7c7c transparent transparent transparent;
+            z-index: 1;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .disabled-button {
+        background-color: gray;
+        cursor: not-allowed;
+        }
+        .responsavel-dropdown {
+        width: 100%;
+        padding: 5px;
+        font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dados do Pipefy</h1>
+
+        <input type="text" id="searchInput" class="search-bar" onkeyup="searchTable()" placeholder="Pesquisar...">
+
+        <button onclick="clearFilters()">Limpar Filtros</button>
+        <br></br>
+
+        <table>
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">ID</th>
+                    <th onclick="sortTable(1)">Etiquetas</th>
+                    <th onclick="sortTable(2)">Título</th>
+                    <th onclick="sortTable(3)">Fase</th>
+                    <th onclick="sortTable(4)">Tipo de envio</th>
+                    <th onclick="sortTable(5)">Tempo na fase atual</th>
+                    <th onclick="sortTable(6)">Dias</th>
+                    <th onclick="sortTable(7)">Setor</th>
+                    <th onclick="sortTable(8)">Pipe</th>
+                    <th onclick="sortTable(9)">Responsável</th>
+                </tr>
+                <tr>
+                    <th><input type="text" onkeyup="filterTable(0)" placeholder="Pesquisar ID"></th>
+                    <th><input type="text" onkeyup="filterTable(1)" placeholder="Pesquisar Etiquetas"></th>
+                    <th><input type="text" onkeyup="filterTable(2)" placeholder="Pesquisar Título"></th>
+                    <th><input type="text" onkeyup="filterTable(3)" placeholder="Pesquisar Fase"></th>
+                    <th><input type="text" onkeyup="filterTable(4)" placeholder="Pesquisar Tipo de envio"></th>
+                    <th><input type="text" onkeyup="filterTable(5)" placeholder="Pesquisar Tempo na fase atual"></th>
+                    <th>
+                        <select id="diasFilterType" onchange="filterTable(6)">
+                            <option value="equals">Igual à</option>
+                            <option value="greater">Maior que</option>
+                            <option value="less">Menor que</option>
+                        </select>
+                        <input type="text" onkeyup="filterTable(6)" placeholder="Pesquisar Dias">
+                    </th>
+                    <th><input type="text" onkeyup="filterTable(7)" placeholder="Pesquisar Setor"></th>
+                    <th><input type="text" onkeyup="filterTable(8)" placeholder="Pesquisar Pipe"></th>
+                    <!-- Filtro de Responsável -->
+                    <th>
+                        <select id="responsavelFilter" onchange="filterResponsavel()">
+                            <option value="">Selecione</option>
+                            <option value="Ademir">Ademir</option>
+                            <option value="Samuel">Samuel</option>
+                            <option value="Winicius">Winicius</option>
+                            <option value="Yan">Yan</option>
+                            <option value="Pedro">Pedro</option>
+                        </select>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="data-tbody">
+                {% for item in dados %}
+                <tr>
+                    <td>
+                        <a href="https://app.pipefy.com/open-cards/{{ item['ID'] }}" target="_blank">{{ item['ID'] }}</a>
+                        {% if 'EXCEÇÃO' in item['Etiquetas'] %}
+                            <span class="info-icon" data-tooltip="{{ item['Exceção'] }}">i</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item['Etiquetas'] | join(', ') }}</td>
+                    <td>{{ item['Título'] }}</td>
+                    <td>{{ item['Fase'] }}</td>
+                    <td>{{ item['Tipo de envio'] }}</td>
+                    <td>{{ item['Tempo na fase atual'] }}</td>
+                    <td class="dias">{{ item['Dias'] }}</td>
+                    <td>{{ item['Setor'] }}</td>
+                    <td>{{ item['Pipe'] }}</td>
+                    <td>
+                        <select class="responsavel-dropdown" onchange="handleResponsavelChange('{{ item['ID'] }}', this.value)">
+                            <option value="" {% if not item['Responsavel do pedido'] %}selected{% endif %}></option>
+                            <option value="Ademir" {% if item['Responsavel do pedido'] == 'Ademir' %}selected{% endif %}>Ademir</option>
+                            <option value="Samuel" {% if item['Responsavel do pedido'] == 'Samuel' %}selected{% endif %}>Samuel</option>
+                            <option value="Winicius" {% if item['Responsavel do pedido'] == 'Winicius' %}selected{% endif %}>Winicius</option>
+                            <option value="Yan" {% if item['Responsavel do pedido'] == 'Yan' %}selected{% endif %}>Yan</option>
+                            <option value="Pedro" {% if item['Responsavel do pedido'] == 'Pedro' %}selected{% endif %}>Pedro</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="abrirLinks('{{ item['Nota fiscal'] }}', this)">Abrir Nota Fiscal</button>
+                    </td>
+                    <td>
+                        <button onclick="abrirLinks('{{ item['Etiqueta dos Correios'] }}', this)">Abrir Etiqueta dos Correios</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="/" class="button">Voltar para Home</a> 
+    </div>
+
+    <script>
+        let sortDirection = {}; 
+        
+        function handleResponsavelChange(cardId, newResponsavel) {
+            console.log(`Card ID: ${cardId}, Novo Responsável: ${newResponsavel}`);
+
+            // Envia a mudança para o backend
+            fetch('/update_action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ card_id: cardId, new_value: newResponsavel })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Responsável atualizado com sucesso no Pipefy');
+                } else {
+                    console.error('Erro ao atualizar o responsável');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+        function handleActionChange(cardId, newValue) {
+            console.log(`Card ID: ${cardId}, Nova Ação: ${newValue}`);
+            fetch('/update_action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ card_id: cardId, new_value: newValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Ação atualizada com sucesso');
+                } else {
+                    console.error('Erro ao atualizar a ação');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function abrirLinks(linkString, buttonElement) {
+            console.log('Links recebidos:', linkString);
+
+            // Remove os caracteres especificados da string
+            const cleanedLinkString = linkString.replace(/[\[\]"]/g, '');
+            console.log('Links limpos:', cleanedLinkString);
+
+            // Divide a string em um array, separando pelos delimitadores (vírgula + espaço)
+            const links = cleanedLinkString.split(',').map(link => link.trim());
+
+            // Verifica se há links válidos
+            const hasValidLinks = links.some(link => link);
+
+            if (hasValidLinks) {
+                // Abrir cada link em uma nova aba
+                links.forEach(link => {
+                    if (link) {
+                        window.open(link, '_blank');
+                    }
+                });
+                // Remove a classe de desabilitado e habilita o botão
+                buttonElement.classList.remove('disabled-button');
+                buttonElement.disabled = false;
+            } else {
+                // Adiciona a classe de desabilitado e desabilita o botão
+                buttonElement.classList.add('disabled-button');
+                buttonElement.disabled = true;
+            }
+        }
+
+        function filterResponsavel() {
+            const filterValue = document.getElementById("responsavelFilter").value.toLowerCase();  // Pega o valor selecionado
+            const tbody = document.getElementById("data-tbody");
+            const rows = Array.from(tbody.rows);
+
+            rows.forEach(row => {
+                const responsavelCell = row.cells[8];  // A coluna "Responsável" é a 9ª (index 8)
+                const responsavel = responsavelCell.querySelector("select").value.toLowerCase();  // Pega o valor do select
+
+                if (filterValue === "" || responsavel.includes(filterValue)) {
+                    row.style.display = "";  // Exibe a linha
+                } else {
+                    row.style.display = "none";  // Oculta a linha
+                }
+            });
+        }
+
+        function filterTable(columnIndex) {
+            const input = document.querySelectorAll('thead input')[columnIndex];
+            const filter = input.value.toLowerCase();
+            const tbody = document.getElementById('data-tbody');
+            const rows = Array.from(tbody.rows);
+
+            if (columnIndex === 6) {
+                const filterType = document.getElementById('diasFilterType').value;
+                rows.forEach(row => {
+                    const cell = row.cells[columnIndex];
+                    const cellValue = parseInt(cell.innerText, 10);
+                    const filterValue = parseInt(filter, 10);
+                    let match = false;
+
+                    if (!isNaN(cellValue) && !isNaN(filterValue)) {
+                        if (filterType === 'equals') {
+                            match = cellValue === filterValue;
+                        } else if (filterType === 'greater') {
+                            match = cellValue > filterValue;
+                        } else if (filterType === 'less') {
+                            match = cellValue < filterValue;
+                        }
+                    }
+
+                    row.style.display = match ? '' : 'none';
+                });
+            } else {
+                rows.forEach(row => {
+                    const cell = row.cells[columnIndex];
+                    const match = cell.innerText.toLowerCase().includes(filter);
+                    row.style.display = match ? '' : 'none';
+                });
+            }
+        }
+
+        function sortTable(columnIndex) {
+            const tbody = document.getElementById('data-tbody');
+            const rows = Array.from(tbody.rows);
+            const direction = sortDirection[columnIndex] || 'asc';
+            const sortedRows = rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].innerText;
+                const bText = b.cells[columnIndex].innerText;
+
+                if (!isNaN(aText) && !isNaN(bText)) {
+                    return direction === 'asc' ? Number(aText) - Number(bText) : Number(bText) - Number(aText);
+                } else {
+                    return direction === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+                }
+            });
+
+            sortedRows.forEach(row => tbody.appendChild(row));
+            sortDirection[columnIndex] = direction === 'asc' ? 'desc' : 'asc';
+        }
+
+        function openLinks(links) {
+            links.forEach(link => {
+                window.open(link, '_blank');
+            });
+        }
+
+        function openLink(link) {
+            window.open(link, '_blank');
+        }
+
+        function clearFilters() {
+            const inputs = document.querySelectorAll('thead input');
+            inputs.forEach(input => input.value = '');
+            const select = document.getElementById('diasFilterType');
+            select.value = 'equals';
+            filterTable(6); // Reaplica o filtro para limpar a coluna "Dias"
+            const tbody = document.getElementById('data-tbody');
+            const rows = Array.from(tbody.rows);
+            rows.forEach(row => row.style.display = '');
+        }
+
+        function applyStyles() {
+            const rows = document.querySelectorAll('#data-tbody tr');
+            rows.forEach(row => {
+                const diasCell = row.querySelector('.dias');
+                const dias = parseInt(diasCell.innerText, 10);
+                const etiquetasCell = row.cells[1];
+                const etiquetas = etiquetasCell.innerText.split(', ');
+                const entrega = row.cells[4].innerText;
+
+                if (!isNaN(dias)) {
+                    let red, green;
+
+                    if (etiquetas.includes('06 - TROCAS')) {
+                        // Condição específica para "06 - TROCAS" com gradiente de cores mais vivas
+                        if (dias >= 5) {
+                            red = 255; // Vermelho
+                            green = 9;
+                        } else if (dias === 1) {
+                            red = 99;
+                            green = 232; // Verde
+                        } else {
+                            // Intermediário (amarelo)
+                            red = Math.round(110 + (dias - 0.5) * ((255 - 110) / 2));
+                            green = Math.round(240 - (dias - 0.5) * ((240 - 219) / 2));
+                        }
+                        diasCell.style.backgroundColor = `rgb(${red}, ${green}, 31)`;
+                    } else {
+                        // Estilo padrão com cores mais vivas
+                        if (dias <= 8) {
+                            green = 255;
+                            red = Math.round((dias - 1) * (255 / 7));
+                        } else {
+                            red = 255;
+                            green = Math.round(255 - (dias - 8) * (255 / 7));
+                        }
+                        diasCell.style.backgroundColor = `rgb(${red}, ${green}, 45)`;
+                    }
+                }
+
+                if (etiquetas.includes('Urgente')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#FF0909'; // Vermelho vivo
+                    }
+                }
+                if (etiquetas.includes('06 - TROCAS')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#37A0FF';
+                        row.cells[i].style.fontWeight = 'bold'; 
+                    }
+                }
+                if (etiquetas.includes('Migração Rápida')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#EC8EF6'; // Rosa vivo
+                        row.cells[i].style.fontWeight = 'bold';
+                    }
+                }
+                if (etiquetas.includes('EXCEÇÃO')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#580404'; // Marrom vivo
+                        row.cells[i].style.color = '#FFFFFF';
+                    }
+                }
+                if (etiquetas.includes('INOVA MACHINE')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#AEAEAE'; // Cinza vivo
+                        row.cells[i].style.color = '#FDFD35'; // Amarelo vivo
+                        row.cells[i].style.fontWeight = 'bold';
+                    }
+                }
+                if (etiquetas.includes('CANCELADO')) {
+                    for (let i = 1; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#000000'; // Preto
+                        row.cells[i].style.color = '#FFFFFF'; // Branco
+                        row.cells[i].style.fontWeight = 'bold';
+                    }
+                }
+                if (entrega.includes('Retirados na AMLabs.')) {
+                    for (let i = 4; i <= 4; i++) {
+                        row.cells[i].style.backgroundColor = '#8B31EF'; // Roxo vivo
+                        row.cells[i].style.color = '#FFFFFF'; // Branco
+                        row.cells[i].style.fontWeight = 'bold';
+                    }
+                }
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', applyStyles);
+    </script>
+</body>
+</html>
