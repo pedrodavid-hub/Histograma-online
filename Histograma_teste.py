@@ -94,6 +94,7 @@ def query_E02():
         '18 - Aguardando Embalagem': 311297630,
         '19 - Liberado para retirada': 311255161,
         'ERRO/CORREÇÃO': 325993095,
+        '16 - Migração Rápida': 333112395,
     }
 
     results = []
@@ -246,6 +247,7 @@ def query_Trocas():
         'Lançar SN': 328615023,
         'Preparação': 328615038,
         'Checklist': 329247774,
+        'Migração Rápida': 333129186,
     }
 
     results = []
