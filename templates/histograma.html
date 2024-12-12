@@ -143,6 +143,8 @@
         <input type="text" id="searchInput" class="search-bar" onkeyup="searchTable()" placeholder="Pesquisar...">
 
         <button onclick="clearFilters()">Limpar Filtros</button>
+        <button onclick="filterEtiquetas('Trocas')">É Trocas</button>
+        <button onclick="filterEtiquetas('Não Trocas')">Não é Trocas</button>
         <br></br>
 
         <table>
@@ -305,21 +307,21 @@
         }
 
         function filterResponsavel() {
-            const filterValue = document.getElementById("responsavelFilter").value.toLowerCase();  // Pega o valor selecionado
-            const tbody = document.getElementById("data-tbody");
-            const rows = Array.from(tbody.rows);
+                const filterValue = document.getElementById("responsavelFilter").value.toLowerCase();  // Pega o valor selecionado
+                const tbody = document.getElementById("data-tbody");
+                const rows = Array.from(tbody.rows);
 
-            rows.forEach(row => {
-                const responsavelCell = row.cells[8];  // A coluna "Responsável" é a 9ª (index 8)
-                const responsavel = responsavelCell.querySelector("select").value.toLowerCase();  // Pega o valor do select
+                rows.forEach(row => {
+                    const responsavelCell = row.cells[9];  // A coluna "Responsável" é a 10ª (index 9)
+                    const responsavel = responsavelCell.querySelector("select").value.toLowerCase();  // Pega o valor do select
 
-                if (filterValue === "" || responsavel.includes(filterValue)) {
-                    row.style.display = "";  // Exibe a linha
-                } else {
-                    row.style.display = "none";  // Oculta a linha
-                }
-            });
-        }
+                    if (filterValue === "" || responsavel.includes(filterValue)) {
+                        row.style.display = "";  // Exibe a linha
+                    } else {
+                        row.style.display = "none";  // Oculta a linha
+                    }
+                });
+            }
 
         function filterTable(columnIndex) {
             const input = document.querySelectorAll('thead input')[columnIndex];
@@ -354,6 +356,24 @@
                     row.style.display = match ? '' : 'none';
                 });
             }
+        }
+        
+        function filterEtiquetas(filterType) {
+            const tbody = document.getElementById('data-tbody');
+            const rows = Array.from(tbody.rows);
+
+            rows.forEach(row => {
+                const etiquetasCell = row.cells[1];  // A coluna "Etiquetas" é a 2ª (index 1)
+                const etiquetas = etiquetasCell.textContent || etiquetasCell.innerText;
+
+                if (filterType === 'Trocas') {
+                    // Exibe linhas que contêm "Trocas"
+                    row.style.display = etiquetas.toLowerCase().includes('trocas') ? '' : 'none';
+                } else if (filterType === 'Não Trocas') {
+                    // Exibe linhas que não contêm "Trocas"
+                    row.style.display = !etiquetas.toLowerCase().includes('trocas') ? '' : 'none';
+                }
+            });
         }
 
         function sortTable(columnIndex) {

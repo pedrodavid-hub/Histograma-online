@@ -725,8 +725,8 @@ def query_P8():
                 "Tipo de envio": card_fields_data.get("entrega_via_correios_ou_ser_o_retirados_na_amlabs", ""),
                 "Tempo na fase atual": tempo_na_fase,
                 "Dias": dias_passados,
-                "Setor": "ADMINISTRATIVO",
-                "Pipe": "E01",
+                "Setor": "COMERCIAL",
+                "Pipe": "P8",
                 "Responsavel": "",
                 "Exceção": card_fields_data.get("pedido_c_exce_o", ""),
                 "Nota fiscal": nota_fiscal,
@@ -791,7 +791,7 @@ def update_action():
 
 @app.route('/histograma', methods=['GET'])
 def tabela_view():
-    dados = query_E02() + query_Trocas() + query_E01()
+    dados = query_E02() + query_Trocas() + query_E01() + query_P8()
     campos = [
         "quantos_kits_nano_market_deseja_1",
     ]
